@@ -1,12 +1,14 @@
 # Lemmy BlackJack Agent
 
 **Universidad EAFIT — Neural Networks and Deep Learning (2026-1)**
-**Author:** Jean Carlo Londoño
+
+**Authors:** Jean Carlo Londoño, Alejandro Garcés Ramírez, Nicolas Ospina Torres 
+
 **Repository purpose:** project proposal — first deliverable
 
 > A continuation and architectural redesign of the Blackjack reinforcement-learning
 > agent originally developed for the Artificial Intelligence course (2025-2,
-> [Reinforcement-Learning-Model-to-Play-BlackJack-Lemmy](https://github.com/JeanRattlehead/Reinforcement-Learning-Model-to-Play-BlackJack-Lemmy)).
+> [Reinforcement-Learning-Model-to-Play-BlackJack-Lemmy](https://github.com/agr-23/Reinforcement-Learning-Model-to-Play-BlackJack-Lemmy)).
 > This iteration aligns the model architecture with the **sequential and partially
 > observable** nature of a Blackjack shoe and improves the supervision data that
 > feeds it.
