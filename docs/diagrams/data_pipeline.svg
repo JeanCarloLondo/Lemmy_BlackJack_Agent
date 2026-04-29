@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 760" font-family="'Inter','Segoe UI',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f7fafc"/>
+    </linearGradient>
+    <linearGradient id="srcA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ebf4ff"/>
+      <stop offset="100%" stop-color="#bee3f8"/>
+    </linearGradient>
+    <linearGradient id="srcB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e6fffa"/>
+      <stop offset="100%" stop-color="#b2f5ea"/>
+    </linearGradient>
+    <linearGradient id="srcC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#faf5ff"/>
+      <stop offset="100%" stop-color="#d6bcfa"/>
+    </linearGradient>
+    <linearGradient id="procGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fffaf0"/>
+      <stop offset="100%" stop-color="#fbd38d"/>
+    </linearGradient>
+    <linearGradient id="trainGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff5f5"/>
+      <stop offset="100%" stop-color="#feb2b2"/>
+    </linearGradient>
+    <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2d3748"/>
+    </marker>
+  </defs>
+
+  <rect width="1320" height="760" fill="url(#bg3)"/>
+
+  <!-- Title -->
+  <text x="660" y="44" text-anchor="middle" font-size="22" font-weight="700" fill="#1a365d">
+    Data Pipeline &#x2014; Sources, Featurisation and Training Stages
+  </text>
+  <text x="660" y="68" text-anchor="middle" font-size="13" fill="#4a5568">
+    From raw shoe trajectories to a sequence-aware experience buffer
+  </text>
+
+  <!-- ============ DATA SOURCES (left column) ============ -->
+  <text x="180" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#2d3748">Data Sources</text>
+
+  <!-- Source A: existing dataset -->
+  <rect x="40" y="130" width="280" height="120" rx="10" fill="url(#srcA)" stroke="#2c5282" stroke-width="2"/>
+  <text x="180" y="158" text-anchor="middle" font-size="14" font-weight="700" fill="#1a365d">A. Historical Hand Dataset</text>
+  <text x="180" y="180" text-anchor="middle" font-size="12" fill="#2c5282">~5,000,000 hands &#xB7; CSV (US H17 / HSDP)</text>
+  <text x="180" y="202" text-anchor="middle" font-size="11" fill="#2d3748">columns: dealer_up, initial_hand,</text>
+  <text x="180" y="218" text-anchor="middle" font-size="11" fill="#2d3748">actions_taken, player_final_value, &#x2026;</text>
+  <text x="180" y="240" text-anchor="middle" font-size="11" fill="#2c5282" font-style="italic">inherited from previous project</text>
+
+  <!-- Source B: self-play simulation -->
+  <rect x="40" y="270" width="280" height="120" rx="10" fill="url(#srcB)" stroke="#2c7a7b" stroke-width="2"/>
+  <text x="180" y="298" text-anchor="middle" font-size="14" font-weight="700" fill="#234e52">B. Self-Play Simulation</text>
+  <text x="180" y="320" text-anchor="middle" font-size="12" fill="#2c7a7b">BlackjackEnv (6 decks, H17, peek)</text>
+  <text x="180" y="340" text-anchor="middle" font-size="11" fill="#2d3748">Full shoe trajectories preserved &#x2014;</text>
+  <text x="180" y="356" text-anchor="middle" font-size="11" fill="#2d3748">running count, sub-hand context, splits</text>
+  <text x="180" y="378" text-anchor="middle" font-size="11" fill="#234e52" font-style="italic">gives the LSTM real sequences to learn from</text>
+
+  <!-- Source C: oracle / MC labels -->
+  <rect x="40" y="410" width="280" height="120" rx="10" fill="url(#srcC)" stroke="#6b46c1" stroke-width="2"/>
+  <text x="180" y="438" text-anchor="middle" font-size="14" font-weight="700" fill="#44337a">C. Composition-Dependent Oracle</text>
+  <text x="180" y="460" text-anchor="middle" font-size="12" fill="#6b46c1">Monte Carlo rollouts over remaining shoe</text>
+  <text x="180" y="482" text-anchor="middle" font-size="11" fill="#2d3748">Per-state expected value of every legal</text>
+  <text x="180" y="498" text-anchor="middle" font-size="11" fill="#2d3748">action &#x2192; high-quality soft labels</text>
+  <text x="180" y="520" text-anchor="middle" font-size="11" fill="#44337a" font-style="italic">replaces the noisy "first-action" label of (A)</text>
+
+  <!-- Arrows to featurisation -->
+  <line x1="324" y1="190" x2="394" y2="280" stroke="#2d3748" stroke-width="1.5" marker-end="url(#arr3)"/>
+  <line x1="324" y1="330" x2="394" y2="330" stroke="#2d3748" stroke-width="1.5" marker-end="url(#arr3)"/>
+  <line x1="324" y1="470" x2="394" y2="380" stroke="#2d3748" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+  <!-- ============ FEATURISATION (middle) ============ -->
+  <rect x="398" y="240" width="320" height="200" rx="10" fill="url(#procGrad)" stroke="#c05621" stroke-width="2"/>
+  <text x="558" y="270" text-anchor="middle" font-size="15" font-weight="700" fill="#7b341e">Featurisation &amp; Sequencing</text>
+  <line x1="418" y1="282" x2="698" y2="282" stroke="#c05621" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+  <text x="558" y="304" text-anchor="middle" font-size="12" fill="#2d3748">&#x2022; Engineered features (12-D, normalised)</text>
+  <text x="558" y="324" text-anchor="middle" font-size="11" fill="#4a5568">player_total, usable_ace, dealer_up,</text>
+  <text x="558" y="340" text-anchor="middle" font-size="11" fill="#4a5568">true_count, can_double / split, hand_index, &#x2026;</text>
+
+  <text x="558" y="364" text-anchor="middle" font-size="12" fill="#2d3748">&#x2022; Card embedding lookup (rank &#x2192; &#x211D;&#x2078;)</text>
+
+  <text x="558" y="388" text-anchor="middle" font-size="12" fill="#2d3748">&#x2022; Sliding window of L = 16 timesteps</text>
+
+  <text x="558" y="412" text-anchor="middle" font-size="11" fill="#7b341e" font-style="italic">output: tensor of shape (L, d) per decision</text>
+
+  <!-- Arrows out -->
+  <line x1="722" y1="290" x2="800" y2="200" stroke="#2d3748" stroke-width="1.5" marker-end="url(#arr3)"/>
+  <line x1="722" y1="380" x2="800" y2="480" stroke="#2d3748" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+  <!-- ============ TRAINING STAGES (right column) ============ -->
+  <text x="990" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#2d3748">Training Stages</text>
+
+  <!-- Stage 1: Behaviour cloning / supervised pretrain -->
+  <rect x="800" y="130" width="380" height="160" rx="10" fill="#fff5f5" stroke="#c53030" stroke-width="2"/>
+  <text x="990" y="158" text-anchor="middle" font-size="15" font-weight="700" fill="#742a2a">Stage 1 &#x2014; Supervised Pretraining</text>
+  <text x="990" y="182" text-anchor="middle" font-size="12" fill="#2d3748">Behaviour cloning of (A) &amp; (C) &#x2192; policy &#x3C0;&#x3B8;</text>
+  <text x="990" y="202" text-anchor="middle" font-size="12" fill="#2d3748">Loss: cross-entropy (hard) + KL (soft, oracle)</text>
+  <text x="990" y="226" text-anchor="middle" font-size="11" fill="#4a5568">Adam, lr=1e-4, weight-decay=1e-6</text>
+  <text x="990" y="244" text-anchor="middle" font-size="11" fill="#4a5568">5 epochs &#xB7; chunked streaming over 5M rows</text>
+  <text x="990" y="270" text-anchor="middle" font-size="11" fill="#742a2a" font-style="italic">Initialises both policy and target networks</text>
+
+  <!-- Down arrow -->
+  <line x1="990" y1="294" x2="990" y2="316" stroke="#2d3748" stroke-width="2" marker-end="url(#arr3)"/>
+
+  <!-- Stage 2: PER buffer -->
+  <rect x="800" y="320" width="380" height="120" rx="10" fill="#f0fff4" stroke="#2f855a" stroke-width="2"/>
+  <text x="990" y="348" text-anchor="middle" font-size="15" font-weight="700" fill="#22543d">Stage 2 &#x2014; Prioritised Replay Buffer</text>
+  <text x="990" y="372" text-anchor="middle" font-size="12" fill="#2d3748">Stores sequences (s&#x209C;&#x208B;&#x2099;&#x2026;s&#x209C;, a&#x209C;, r&#x209C;, s&#x209C;&#x208A;&#x2081;, d&#x209C;)</text>
+  <text x="990" y="394" text-anchor="middle" font-size="12" fill="#2d3748">Sum-tree, &#x3B1;=0.6, &#x3B2; annealed 0.4 &#x2192; 1.0</text>
+  <text x="990" y="420" text-anchor="middle" font-size="11" fill="#22543d" font-style="italic">Filled with self-play under the pretrained policy</text>
+
+  <line x1="990" y1="444" x2="990" y2="466" stroke="#2d3748" stroke-width="2" marker-end="url(#arr3)"/>
+
+  <!-- Stage 3: RL fine-tune -->
+  <rect x="800" y="470" width="380" height="160" rx="10" fill="url(#trainGrad)" stroke="#9b2c2c" stroke-width="2"/>
+  <text x="990" y="498" text-anchor="middle" font-size="15" font-weight="700" fill="#742a2a">Stage 3 &#x2014; Reinforcement Fine-Tuning</text>
+  <text x="990" y="522" text-anchor="middle" font-size="12" fill="#2d3748">Recurrent Dueling Double DQN</text>
+  <text x="990" y="544" text-anchor="middle" font-size="12" fill="#2d3748">&#x3B5;-greedy with basic-strategy fallback</text>
+  <text x="990" y="566" text-anchor="middle" font-size="12" fill="#2d3748">Polyak target update, &#x3C4; = 0.005</text>
+  <text x="990" y="592" text-anchor="middle" font-size="11" fill="#4a5568">300k+ episodes, eval every 1k steps</text>
+  <text x="990" y="612" text-anchor="middle" font-size="11" fill="#742a2a" font-style="italic">Periodic checkpointing &amp; evaluation vs. baseline</text>
+
+  <!-- ============ Footer ============ -->
+  <rect x="40" y="660" width="1240" height="80" rx="10" fill="#edf2f7" stroke="#4a5568" stroke-width="1"/>
+  <text x="660" y="688" text-anchor="middle" font-size="13" font-weight="700" fill="#1a365d">
+    Key data-source improvement over the previous project
+  </text>
+  <text x="660" y="710" text-anchor="middle" font-size="12" fill="#2d3748">
+    The original CSV only kept the first action of each shoe, discarding the temporal context the LSTM relies on.
+  </text>
+  <text x="660" y="728" text-anchor="middle" font-size="12" fill="#2d3748">
+    Sources (B) and (C) preserve full sub-hand trajectories and supply higher-quality, composition-dependent labels.
+  </text>
+</svg>
