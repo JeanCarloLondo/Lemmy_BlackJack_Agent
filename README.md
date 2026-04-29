@@ -22,8 +22,9 @@
 3. [Base Architecture](#3-base-architecture)
 4. [Proposed Architecture](#4-proposed-architecture)
 5. [Data-Source Improvement](#5-data-source-improvement)
-6. [Roadmap](#6-roadmap)
-7. [References](#7-references)
+6. [Transfer Learning Strategy](#6-transfer-learning-strategy)
+7. [Roadmap](#7-roadmap)
+8. [References](#8-references)
 
 ---
 
@@ -321,19 +322,95 @@ network.
 
 ---
 
-## 6. Roadmap
+## 6. Transfer Learning Strategy
 
-This deliverable scopes only **problem definition, data, base architecture and
-proposed architecture**. Subsequent deliverables will cover:
+The proposed architecture is not trained from scratch — it leverages the
+**300,000-episode checkpoint** of the inherited base DQN as a warm start. This
+is a natural form of transfer learning: the source task (flat-state Blackjack)
+and the target task (sequence-aware Blackjack) share the same action space,
+reward structure and underlying game dynamics. Only the state representation
+changes.
 
-- Implementation of the recurrent dueling agent.
-- Transfer learning from the inherited base checkpoint into the new
-  architecture (shared FC trunk weights are reusable).
+![Transfer learning](docs/diagrams/transfer_learning.svg)
+
+### 6.1. What is transferred
+
+The base DQN has three fully-connected layers (`512 → 512 → 256`) that learned
+useful state-value representations over 300 k episodes of play. These layers
+map directly onto the **shared trunk** of the proposed dueling architecture:
+
+| Source layer            | Target layer                | Transfer method        |
+| ----------------------- | --------------------------- | ---------------------- |
+| `Linear(10 → 512)`      | Trunk FC 1 (`512 → 512`)    | direct weight copy     |
+| `Linear(512 → 512)`     | Trunk FC 2 (`512 → 256`)    | direct weight copy     |
+| `Linear(512 → 256)`     | Trunk FC 3 (`512 → 256`)    | direct weight copy     |
+| `Linear(256 → 4)` (head)| —                           | **discarded** (shape mismatch) |
+
+A new **adapter projection** (`Linear(128 → 512)`) bridges the LSTM encoder
+output into the trunk's expected input dimensionality.
+
+### 6.2. What is trained from scratch
+
+| Component          | Parameters (approx.) | Reason                                              |
+| ------------------ | -------------------: | --------------------------------------------------- |
+| Card embedding     |              104     | no equivalent in the base model                     |
+| LSTM encoder       |          ~265 k      | entirely new sequential component                   |
+| Adapter projection |           65 k       | bridges LSTM output → trunk input                   |
+| Value head         |           33 k       | dueling decomposition did not exist in the base     |
+| Advantage head     |           33 k       | dueling decomposition did not exist in the base     |
+
+### 6.3. Discriminative fine-tuning schedule
+
+Unfreezing all layers at once would let the randomly-initialised heads
+propagate large gradients through the trunk and destroy the transferred
+representations (*catastrophic forgetting*). Instead, we adopt a three-phase
+**discriminative fine-tuning** strategy:
+
+| Phase | Episodes   | Trunk state                  | New components lr       | Trunk lr                    |
+| :---: | ---------- | ---------------------------- | ----------------------- | --------------------------- |
+| 1     | 0 – 50 k   | **fully frozen**             | $1 \times 10^{-3}$     | 0 (no gradients)            |
+| 2     | 50 k – 150 k | layer 3 unfrozen; 1-2 frozen | $5 \times 10^{-4}$     | $5 \times 10^{-5}$ (×0.1)  |
+| 3     | 150 k +    | **all unfrozen**             | $1 \times 10^{-4}$     | $1 \times 10^{-6}$ (×0.01) |
+
+**Phase 1** lets the LSTM, embedding and dueling heads learn to produce
+representations that are *compatible* with what the frozen trunk expects —
+without moving the trunk at all.
+
+**Phase 2** unfreezes the deepest trunk layer so it can adapt to the new
+feature distribution coming from the LSTM, while early layers stay stable.
+
+**Phase 3** opens the full network for end-to-end refinement at a very low
+trunk learning rate, preserving the inherited state-value knowledge while
+allowing global co-adaptation.
+
+### 6.4. Why this works for Blackjack
+
+- **Shared task structure.** Both source and target play the same game with the
+  same reward signal — the trunk's learned mapping from (total, dealer_up, …) to
+  internal value features remains valid.
+- **Complementary new components.** The LSTM and dueling heads add capabilities
+  the base lacked (temporal context, V/A decomposition) without contradicting
+  what the trunk already knows.
+- **Reduced sample complexity.** The trunk starts with meaningful features
+  instead of random weights, so the agent reaches competitive play much earlier
+  — the target of < 100 k episodes to 40 % win rate relies on this head start.
+
+---
+
+## 7. Roadmap
+
+This deliverable covers **problem definition, data, base architecture,
+proposed architecture, data-source improvement and transfer learning
+strategy**. Subsequent deliverables will cover:
+
+- Implementation of the recurrent dueling agent and the discriminative
+  fine-tuning pipeline described in §6.
+- Execution of the three-phase training schedule with the inherited checkpoint.
 - Quantitative comparison against the base on identical evaluation settings.
 
 ---
 
-## 7. References
+## 8. References
 
 1. Mnih, V. et al. *Human-level control through deep reinforcement learning.*
    Nature, 2015.
@@ -350,3 +427,7 @@ proposed architecture**. Subsequent deliverables will cover:
 7. Baldwin, R. R. et al. *The Optimum Strategy in Blackjack.* JASA, 1956.
 8. Liu, J. & Spil, B. *Deep Reinforcement Learning in Blackjack with a Full
    Deck History.* IEEE CoG, 2021.
+9. Yosinski, J. et al. *How transferable are features in deep neural networks?*
+   NeurIPS, 2014.
+10. Howard, J. & Ruder, S. *Universal Language Model Fine-tuning for Text
+    Classification.* ACL, 2018. (Discriminative fine-tuning strategy.)

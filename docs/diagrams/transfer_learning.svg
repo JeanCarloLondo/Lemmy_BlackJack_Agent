@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" font-family="'Inter','Segoe UI',system-ui,sans-serif">
+  <defs>
+    <linearGradient id="bg4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f7fafc"/>
+    </linearGradient>
+    <linearGradient id="frozenGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ebf4ff"/>
+      <stop offset="100%" stop-color="#90cdf4"/>
+    </linearGradient>
+    <linearGradient id="trainableGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0fff4"/>
+      <stop offset="100%" stop-color="#9ae6b4"/>
+    </linearGradient>
+    <linearGradient id="newGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fffaf0"/>
+      <stop offset="100%" stop-color="#fbd38d"/>
+    </linearGradient>
+    <linearGradient id="srcModelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#faf5ff"/>
+      <stop offset="100%" stop-color="#e9d8fd"/>
+    </linearGradient>
+    <linearGradient id="phaseGradA" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#bee3f8"/>
+      <stop offset="100%" stop-color="#90cdf4"/>
+    </linearGradient>
+    <linearGradient id="phaseGradB" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fefcbf"/>
+      <stop offset="100%" stop-color="#f6e05e"/>
+    </linearGradient>
+    <linearGradient id="phaseGradC" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c6f6d5"/>
+      <stop offset="100%" stop-color="#68d391"/>
+    </linearGradient>
+    <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2d3748"/>
+    </marker>
+    <marker id="arrTransfer" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d53f8c"/>
+    </marker>
+    <marker id="arrBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3182ce"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="900" fill="url(#bg4)"/>
+
+  <!-- Title -->
+  <text x="700" y="44" text-anchor="middle" font-size="24" font-weight="700" fill="#1a365d">
+    Transfer Learning Strategy — From Base DQN to Recurrent Dueling DQN
+  </text>
+  <text x="700" y="70" text-anchor="middle" font-size="14" fill="#4a5568">
+    Reusing learned representations from the inherited checkpoint to accelerate training of the proposed architecture
+  </text>
+
+  <!-- ===== SOURCE MODEL (left) ===== -->
+  <rect x="40" y="100" width="340" height="430" rx="14" fill="none" stroke="#6b46c1" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="210" y="128" text-anchor="middle" font-size="16" font-weight="700" fill="#44337a">Source Model (Inherited)</text>
+  <text x="210" y="148" text-anchor="middle" font-size="12" fill="#6b46c1">checkpoint_ep300000.pth &#x2014; ~400k params</text>
+
+  <!-- Source layers -->
+  <rect x="70" y="172" width="280" height="50" rx="8" fill="url(#srcModelGrad)" stroke="#6b46c1" stroke-width="1.5"/>
+  <text x="210" y="194" text-anchor="middle" font-size="13" font-weight="600" fill="#44337a">Input &#x2192; Linear(10, 512) + ReLU</text>
+  <text x="210" y="212" text-anchor="middle" font-size="10" fill="#6b46c1">Xavier init &#xB7; 5,632 params</text>
+
+  <rect x="70" y="236" width="280" height="50" rx="8" fill="url(#srcModelGrad)" stroke="#6b46c1" stroke-width="1.5"/>
+  <text x="210" y="258" text-anchor="middle" font-size="13" font-weight="600" fill="#44337a">Linear(512, 512) + ReLU</text>
+  <text x="210" y="276" text-anchor="middle" font-size="10" fill="#6b46c1">262,656 params</text>
+
+  <rect x="70" y="300" width="280" height="50" rx="8" fill="url(#srcModelGrad)" stroke="#6b46c1" stroke-width="1.5"/>
+  <text x="210" y="322" text-anchor="middle" font-size="13" font-weight="600" fill="#44337a">Linear(512, 256) + ReLU</text>
+  <text x="210" y="340" text-anchor="middle" font-size="10" fill="#6b46c1">131,328 params</text>
+
+  <rect x="70" y="364" width="280" height="50" rx="8" fill="#e2e8f0" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="210" y="386" text-anchor="middle" font-size="13" font-weight="600" fill="#718096">Linear(256, 4) &#x2014; output head</text>
+  <text x="210" y="404" text-anchor="middle" font-size="10" fill="#a0aec0">discarded (architecture mismatch)</text>
+
+  <!-- Legend in source box -->
+  <rect x="80" y="438" width="16" height="16" rx="3" fill="url(#srcModelGrad)" stroke="#6b46c1" stroke-width="1"/>
+  <text x="102" y="451" font-size="11" fill="#2d3748">Transferred to target</text>
+  <rect x="80" y="462" width="16" height="16" rx="3" fill="#e2e8f0" stroke="#a0aec0" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="102" y="475" font-size="11" fill="#2d3748">Discarded (incompatible shape)</text>
+
+  <!-- ===== TRANSFER ARROWS ===== -->
+  <path d="M 354,197 C 460,197 460,290 540,290" fill="none" stroke="#d53f8c" stroke-width="2.5" marker-end="url(#arrTransfer)"/>
+  <path d="M 354,261 C 460,261 460,350 540,350" fill="none" stroke="#d53f8c" stroke-width="2.5" marker-end="url(#arrTransfer)"/>
+  <path d="M 354,325 C 460,325 460,410 540,410" fill="none" stroke="#d53f8c" stroke-width="2.5" marker-end="url(#arrTransfer)"/>
+
+  <text x="448" y="218" text-anchor="middle" font-size="12" font-weight="700" fill="#d53f8c">copy</text>
+  <text x="448" y="234" text-anchor="middle" font-size="12" font-weight="700" fill="#d53f8c">weights</text>
+
+  <!-- ===== TARGET MODEL (right) ===== -->
+  <rect x="520" y="100" width="840" height="430" rx="14" fill="none" stroke="#2f855a" stroke-width="2"/>
+  <text x="940" y="128" text-anchor="middle" font-size="16" font-weight="700" fill="#22543d">Target Model (Proposed)</text>
+  <text x="940" y="148" text-anchor="middle" font-size="12" fill="#2f855a">Recurrent Dueling Double DQN &#x2014; ~750k params</text>
+
+  <!-- New: LSTM Encoder (random init) -->
+  <rect x="544" y="172" width="200" height="70" rx="8" fill="url(#newGrad)" stroke="#c05621" stroke-width="2"/>
+  <text x="644" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="#7b341e">LSTM Encoder</text>
+  <text x="644" y="214" text-anchor="middle" font-size="11" fill="#c05621">2-layer, hidden=128</text>
+  <text x="644" y="230" text-anchor="middle" font-size="10" fill="#7b341e" font-style="italic">random init (new component)</text>
+
+  <!-- New: Card Embedding (random init) -->
+  <rect x="764" y="172" width="200" height="70" rx="8" fill="url(#newGrad)" stroke="#c05621" stroke-width="2"/>
+  <text x="864" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="#7b341e">Card Embedding</text>
+  <text x="864" y="214" text-anchor="middle" font-size="11" fill="#c05621">Embedding(13, 8)</text>
+  <text x="864" y="230" text-anchor="middle" font-size="10" fill="#7b341e" font-style="italic">random init (new component)</text>
+
+  <!-- Transferred: Trunk FC 256x2 (from source) -->
+  <rect x="544" y="270" width="420" height="50" rx="8" fill="url(#frozenGrad)" stroke="#3182ce" stroke-width="2"/>
+  <text x="754" y="292" text-anchor="middle" font-size="13" font-weight="700" fill="#2c5282">Trunk Layer 1 — FC(512 &#x2192; 512) + LayerNorm + ReLU</text>
+  <text x="754" y="310" text-anchor="middle" font-size="10" fill="#3182ce">&#x2190; weights from source layer 1 &#xB7; initially frozen</text>
+
+  <rect x="544" y="334" width="420" height="50" rx="8" fill="url(#frozenGrad)" stroke="#3182ce" stroke-width="2"/>
+  <text x="754" y="356" text-anchor="middle" font-size="13" font-weight="700" fill="#2c5282">Trunk Layer 2 — FC(512 &#x2192; 256) + LayerNorm + ReLU</text>
+  <text x="754" y="374" text-anchor="middle" font-size="10" fill="#3182ce">&#x2190; weights from source layer 2 &#xB7; initially frozen</text>
+
+  <rect x="544" y="398" width="420" height="50" rx="8" fill="url(#frozenGrad)" stroke="#3182ce" stroke-width="2"/>
+  <text x="754" y="420" text-anchor="middle" font-size="13" font-weight="700" fill="#2c5282">Trunk Layer 3 — FC(512 &#x2192; 256) + LayerNorm + ReLU</text>
+  <text x="754" y="438" text-anchor="middle" font-size="10" fill="#3182ce">&#x2190; weights from source layer 3 &#xB7; initially frozen</text>
+
+  <!-- New: Dueling Heads (random init) -->
+  <rect x="988" y="270" width="350" height="80" rx="8" fill="url(#newGrad)" stroke="#c05621" stroke-width="2"/>
+  <text x="1163" y="296" text-anchor="middle" font-size="13" font-weight="700" fill="#7b341e">Value Head: FC(256 &#x2192; 128 &#x2192; 1)</text>
+  <text x="1163" y="316" text-anchor="middle" font-size="11" fill="#c05621">V(s) — random init</text>
+  <text x="1163" y="338" text-anchor="middle" font-size="10" fill="#7b341e" font-style="italic">new component (no base equivalent)</text>
+
+  <rect x="988" y="370" width="350" height="80" rx="8" fill="url(#newGrad)" stroke="#c05621" stroke-width="2"/>
+  <text x="1163" y="396" text-anchor="middle" font-size="13" font-weight="700" fill="#7b341e">Advantage Head: FC(256 &#x2192; 128 &#x2192; 4)</text>
+  <text x="1163" y="416" text-anchor="middle" font-size="11" fill="#c05621">A(s, &#xB7;) — random init</text>
+  <text x="1163" y="438" text-anchor="middle" font-size="10" fill="#7b341e" font-style="italic">new component (no base equivalent)</text>
+
+  <!-- Target-side legend -->
+  <rect x="554" y="464" width="16" height="16" rx="3" fill="url(#frozenGrad)" stroke="#3182ce" stroke-width="1"/>
+  <text x="576" y="477" font-size="11" fill="#2d3748">Pretrained weights (transferred)</text>
+  <rect x="774" y="464" width="16" height="16" rx="3" fill="url(#newGrad)" stroke="#c05621" stroke-width="1"/>
+  <text x="796" y="477" font-size="11" fill="#2d3748">Randomly initialised (new)</text>
+
+  <!-- ===== FINE-TUNING PHASES (bottom) ===== -->
+  <text x="700" y="560" text-anchor="middle" font-size="18" font-weight="700" fill="#1a365d">
+    Discriminative Fine-Tuning Schedule
+  </text>
+  <text x="700" y="580" text-anchor="middle" font-size="12" fill="#4a5568">
+    Gradually unfreeze transferred layers so new components adapt before disrupting inherited representations
+  </text>
+
+  <!-- Phase timeline bar -->
+  <rect x="100" y="610" width="400" height="10" rx="5" fill="url(#phaseGradA)"/>
+  <rect x="500" y="610" width="400" height="10" rx="5" fill="url(#phaseGradB)"/>
+  <rect x="900" y="610" width="400" height="10" rx="5" fill="url(#phaseGradC)"/>
+  <text x="300" y="604" text-anchor="middle" font-size="12" font-weight="700" fill="#2c5282">Phase 1</text>
+  <text x="700" y="604" text-anchor="middle" font-size="12" font-weight="700" fill="#975a16">Phase 2</text>
+  <text x="1100" y="604" text-anchor="middle" font-size="12" font-weight="700" fill="#276749">Phase 3</text>
+  <text x="100" y="640" font-size="11" fill="#4a5568">ep 0</text>
+  <text x="495" y="640" text-anchor="middle" font-size="11" fill="#4a5568">~50k ep</text>
+  <text x="895" y="640" text-anchor="middle" font-size="11" fill="#4a5568">~150k ep</text>
+  <text x="1270" y="640" font-size="11" fill="#4a5568">~300k+ ep</text>
+
+  <!-- Phase 1 details -->
+  <rect x="60" y="660" width="400" height="160" rx="10" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="260" y="686" text-anchor="middle" font-size="14" font-weight="700" fill="#2c5282">Phase 1 — Feature Adaptation</text>
+  <text x="260" y="708" text-anchor="middle" font-size="12" fill="#2d3748">Trunk layers: FROZEN</text>
+  <text x="260" y="728" text-anchor="middle" font-size="12" fill="#2d3748">LSTM + Embedding + Heads: trainable</text>
+  <text x="260" y="752" text-anchor="middle" font-size="12" fill="#2d3748">lr = 1 &#xD7; 10&#x207B;&#xB3;</text>
+  <line x1="80" y1="764" x2="440" y2="764" stroke="#3182ce" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <text x="260" y="784" text-anchor="middle" font-size="11" fill="#2c5282" font-style="italic">New components learn to produce</text>
+  <text x="260" y="800" text-anchor="middle" font-size="11" fill="#2c5282" font-style="italic">representations compatible with the</text>
+  <text x="260" y="816" text-anchor="middle" font-size="11" fill="#2c5282" font-style="italic">pretrained trunk features.</text>
+
+  <!-- Phase 2 details -->
+  <rect x="500" y="660" width="400" height="160" rx="10" fill="#fefcbf" stroke="#d69e2e" stroke-width="1.5"/>
+  <text x="700" y="686" text-anchor="middle" font-size="14" font-weight="700" fill="#975a16">Phase 2 — Partial Unfreeze</text>
+  <text x="700" y="708" text-anchor="middle" font-size="12" fill="#2d3748">Trunk layer 3: unfrozen (lr &#xD7; 0.1)</text>
+  <text x="700" y="728" text-anchor="middle" font-size="12" fill="#2d3748">Trunk layers 1-2: still frozen</text>
+  <text x="700" y="748" text-anchor="middle" font-size="12" fill="#2d3748">LSTM + Embedding + Heads: lr = 5 &#xD7; 10&#x207B;&#x2074;</text>
+  <line x1="520" y1="764" x2="880" y2="764" stroke="#d69e2e" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <text x="700" y="784" text-anchor="middle" font-size="11" fill="#975a16" font-style="italic">The deepest trunk layer adapts to the</text>
+  <text x="700" y="800" text-anchor="middle" font-size="11" fill="#975a16" font-style="italic">new feature distribution from the LSTM,</text>
+  <text x="700" y="816" text-anchor="middle" font-size="11" fill="#975a16" font-style="italic">while early layers remain stable.</text>
+
+  <!-- Phase 3 details -->
+  <rect x="940" y="660" width="400" height="160" rx="10" fill="#f0fff4" stroke="#38a169" stroke-width="1.5"/>
+  <text x="1140" y="686" text-anchor="middle" font-size="14" font-weight="700" fill="#276749">Phase 3 — Full Fine-Tuning</text>
+  <text x="1140" y="708" text-anchor="middle" font-size="12" fill="#2d3748">All layers: trainable</text>
+  <text x="1140" y="728" text-anchor="middle" font-size="12" fill="#2d3748">Trunk: lr &#xD7; 0.01 (discriminative)</text>
+  <text x="1140" y="748" text-anchor="middle" font-size="12" fill="#2d3748">New components: lr = 1 &#xD7; 10&#x207B;&#x2074;</text>
+  <line x1="960" y1="764" x2="1320" y2="764" stroke="#38a169" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <text x="1140" y="784" text-anchor="middle" font-size="11" fill="#276749" font-style="italic">End-to-end refinement with low trunk lr</text>
+  <text x="1140" y="800" text-anchor="middle" font-size="11" fill="#276749" font-style="italic">prevents catastrophic forgetting of the</text>
+  <text x="1140" y="816" text-anchor="middle" font-size="11" fill="#276749" font-style="italic">learned state-value representations.</text>
+
+  <!-- Footer note -->
+  <rect x="60" y="848" width="1280" height="36" rx="6" fill="#edf2f7" stroke="#4a5568" stroke-width="1"/>
+  <text x="700" y="872" text-anchor="middle" font-size="12" fill="#2d3748">
+    The 10&#x2192;512 input projection of the source model is reused as-is for the trunk&#x2019;s first layer. The LSTM output (128-D) is projected to 512 via a new adapter layer before entering the trunk.
+  </text>
+</svg>
